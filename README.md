@@ -69,4 +69,79 @@ plugins {
 }
 ```
 
-### 2️⃣ core
+## 2️⃣ core
+> core:ui
+- feature module에서 공통적으로 사용되는 UI component 및 Util 등 관리
+  
+[참고 1 - RecyclerView 공통 코드]
+
+1.1 MultiTypeAdapter : Multi Type RecyclerView 공통 Adapter
+```
+// 사용 예제
+class SampleAdapter(
+    private val onClickItem: (SampleListItem, View) -> Unit
+) : MultiTypeAdapter<SampleListItem>(
+    onClickListener = onClickItem,
+    checkContentDiff = { old, new -> old == new }
+) {
+    override fun onCreateViewHolder(
+        parent: ViewGroup,
+        viewType: Int
+    ): BaseViewHolder<SampleListItem> {
+        val currentViewType = SampleViewType.entries[viewType] // Enum Type
+        val inflater = LayoutInflater.from(parent.context)
+        return when (currentViewType) {
+            SampleViewType.TITLE -> TitleViewHolder(ItemTitleBinding.inflate(inflater, parent, false))
+            SampleViewType.ITEM -> SampleItemViewHolder(ItemSampleBinding.inflate(inflater, parent, false))
+            SampleViewType.IMAGE -> ImageViewHolder(ItemImageBinding.inflate(inflater, parent, false))
+        } as BaseViewHolder<SampleListItem>
+    }
+}
+```
+
+1.2 SingleTypeAdapter : Single Type RecyclerView 공통 Adapter
+```
+// 사용 예제
+
+class SampleAdapter(
+    private val onClickItem: (SampleListItem, View) -> Unit
+) : SingleTypeAdapter<SampleListItem>(
+    onClickListener = onClickItem,
+    checkContentDiff = { old, new -> old == new }
+) {
+    override fun onCreateViewHolder(parent: ViewGroup): BaseViewHolder<SampleListItem> {
+        return TitleViewHolder(
+            ItemTitleBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        ) as BaseViewHolder<SampleListItem>
+    }
+}
+```
+
+[참고 2 - RecyclerView 공통 코드]
+
+2.1 Navigator : feature 간 이동 로직 관리
+```
+// 사용 예제
+/**
+ * 각 화면간의 이동 관리 ( core:ui )
+ */
+interface Navigator {
+    fun moveToBActivity(context: Context)
+}
+
+// 구현체 ( app )
+class SampleNavigator @Inject constructor() : Navigator {
+    override fun moveToBActivity(context: Context) {
+        context.startActivity(
+            Intent(context, BActivity::class.java)
+        )
+    }
+}
+```
+
+> core:common
+- 
