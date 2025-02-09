@@ -143,5 +143,64 @@ class SampleNavigator @Inject constructor() : Navigator {
 }
 ```
 
-> core:common
-- 
+<br/>
+
+> core:domain
+- UseCase 와 Repository Interface
+- model 명 : 000Model (ex. SampleModel)
+
+> core:data
+- Datasource 와 Repository 구현체
+- model 명 : 000Data (ex. SampleData)
+
+[참고 1 - API 호출 Util 코드 사용]
+
+1.1 Response Body를 반환해줍니다.
+1.2 200 대 코드가 아닐 시 NetworkException이 던져(throw)집니다.
+
+```
+override suspend fun get(): Result<List<String>> {
+    return runCatching {
+        ApiCallUtil {
+            sampleApi.getImagesInfo(
+                page = 1,
+                limit = 10
+            )
+        }.map { it.imageUrl }
+    }
+}
+```
+
+> core:database
+- Room Local Database 관리
+- model 명 : 000Entity (ex. SampleEntity)
+
+> core:datastore
+- DataStore 와 SharedPreference 관리
+- model 명 : 000Entity (ex. SampleEntity)
+
+> core:network
+- Retrofit을 이용한 API 통신
+- model 명 : 000Request(요청), 000Response(응답)
+- API의 반환값은 Response<T>로 지정하는것을 권장합니다!
+- kotlin-serialization가 적용되었습니다.
+```
+// 다른 Converter 사용 시 아래 Module에 추가해주세요 :-)
+@Module
+@InstallIn(SingletonComponent::class)
+object ConverterFactoryModule {
+    @Provides
+    @Singleton
+    fun provideJsonConverter(): Converter.Factory {
+        return Json {
+            coerceInputValues = true // null 값으로 들어오면 default value로 처리
+            ignoreUnknownKeys = true // 프로퍼티로 선언되지 않은 key는 무시
+        }.asConverterFactory("application/json".toMediaType())
+    }
+}
+```
+
+[참고 1 - AuthInterceptor]
+
+- API 통신에 필요한 Authentication Header 전처리를 하는 곳입니다.
+  
