@@ -1,4 +1,5 @@
 pluginManagement {
+    includeBuild("build-logic")
     repositories {
         google {
             content {
@@ -19,5 +20,16 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MultiTemplate"
+rootProject.name = "MultiModuleTemplate"
 include(":app")
+// feature
+include(":feature:sample")
+
+// core
+include(":core:ui")
+include(":core:network")
+include(":core:database")
+include(":core:datastore")
+include(":core:data")
+include(":core:domain")
+include(":core:common")
